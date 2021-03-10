@@ -30,6 +30,15 @@ defmodule ProductivityReportTest do
     end
   end
 
+  describe "build_from_many/1" do
+    test "should return an error when file_names isn't a string list" do
+      return = ProductivityReport.buid_from_many("bad")
+      expected = {:error, "Please provide a list of file names."}
+
+      assert return == expected
+    end
+  end
+
   describe "fetch_max_from_field/2" do
     test "should return the greatest contributor from 'all_hours'" do
       file_name = "test_report"

@@ -5,6 +5,19 @@ defmodule ProductivityReport do
 
   @deep_fields [:hours_per_month, :hours_per_year]
 
+  def buid_from_many(file_names) when not is_list(file_names) do
+    {:error, "Please provide a list of file names."}
+  end
+
+  def build_from_many(file_names) do
+    report =
+      file_names
+      |> Task.async_stream(&build/1)
+      |> Enum.reduce(initialize_report(), &merge_reports/2)
+
+    {:ok, report}
+  end
+
   def build(file_name) do
     file_name
     |> Parser.call()
@@ -23,6 +36,36 @@ defmodule ProductivityReport do
   end
 
   def fetch_max_from_deep_field(_report, _field, _sub_field), do: {:error, "Invalid field."}
+
+  defp merge_reports({:ok, partial}, report) do
+    all_hours = merge_all_hours(partial.all_hours, report.all_hours)
+    hours_per_month = merge_hours_per_month(partial.hours_per_month, report.hours_per_month)
+    hours_per_year = merge_hours_per_year(partial.hours_per_year, report.hours_per_year)
+
+    build_report(all_hours, hours_per_month, hours_per_year)
+  end
+
+  defp merge_all_hours(partial_all_hours, all_hours) do
+    merge_by_value(partial_all_hours, all_hours)
+  end
+
+  defp merge_hours_per_month(partial_hours_per_month, hours_per_month) do
+    merge_by_map(partial_hours_per_month, hours_per_month)
+  end
+
+  defp merge_hours_per_year(partial_hours_per_year, hours_per_year) do
+    merge_by_map(partial_hours_per_year, hours_per_year)
+  end
+
+  defp merge_by_map(map_one, map_two) do
+    Map.merge(map_one, map_two, fn _key, value_one, value_two ->
+      merge_by_value(value_one, value_two)
+    end)
+  end
+
+  defp merge_by_value(map_one, map_two) do
+    Map.merge(map_one, map_two, fn _key, value_one, value_two -> value_one + value_two end)
+  end
 
   defp accumulate_fields(line, report) do
     all_hours = accumulate_all_hours(line, report.all_hours)

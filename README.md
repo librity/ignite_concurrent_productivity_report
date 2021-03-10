@@ -19,6 +19,7 @@ Generate reports:
 ```elixir
 > ProductivityReport.build("test_report")
 > ProductivityReport.build("gen_report")
+> ProductivityReport.build_from_many(["part_1", "part_2", "part_3"])
 ```
 
 Measuring execution time in microseconds:
@@ -26,6 +27,7 @@ Measuring execution time in microseconds:
 ```elixir
 > :timer.tc(fn -> ProductivityReport.build("test_report") end)
 > :timer.tc(fn -> ProductivityReport.build("gen_report") end)
+> :timer.tc(fn -> ProductivityReport.build_from_many(["part_1", "part_2", "part_3"]) end)
 ```
 
 Exploring Elixir's syntax:
