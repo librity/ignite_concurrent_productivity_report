@@ -1,6 +1,6 @@
-# ProductivityReport
+# ConcurrentProductivityReport
 
-A simple Elixir program that generates an employee productivity report from raw CSV data.
+A simple Elixir program that concurrently generates an employee productivity report from raw CSV data.
 
 CSV colums are parsed as name, hours worked, day, month and year.
 
