@@ -58,8 +58,8 @@ defmodule ProductivityReport do
   end
 
   defp recursive_merge(left, right) when is_map(left) do
-    Map.merge(left, right, fn _key, left_val, right_val ->
-      recursive_merge(left_val, right_val)
+    Map.merge(left, right, fn _key, left_value, right_value ->
+      recursive_merge(left_value, right_value)
     end)
   end
 
