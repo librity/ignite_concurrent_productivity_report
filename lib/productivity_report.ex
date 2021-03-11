@@ -46,26 +46,24 @@ defmodule ProductivityReport do
   end
 
   defp merge_all_hours(partial_all_hours, all_hours) do
-    merge_by_value(partial_all_hours, all_hours)
+    recursive_merge(partial_all_hours, all_hours)
   end
 
   defp merge_hours_per_month(partial_hours_per_month, hours_per_month) do
-    merge_by_map(partial_hours_per_month, hours_per_month)
+    recursive_merge(partial_hours_per_month, hours_per_month)
   end
 
   defp merge_hours_per_year(partial_hours_per_year, hours_per_year) do
-    merge_by_map(partial_hours_per_year, hours_per_year)
+    recursive_merge(partial_hours_per_year, hours_per_year)
   end
 
-  defp merge_by_map(map_one, map_two) do
-    Map.merge(map_one, map_two, fn _key, value_one, value_two ->
-      merge_by_value(value_one, value_two)
+  defp recursive_merge(left, right) when is_map(left) do
+    Map.merge(left, right, fn _key, left_val, right_val ->
+      recursive_merge(left_val, right_val)
     end)
   end
 
-  defp merge_by_value(map_one, map_two) do
-    Map.merge(map_one, map_two, fn _key, value_one, value_two -> value_one + value_two end)
-  end
+  defp recursive_merge(left, right), do: left + right
 
   defp accumulate_fields(line, report) do
     all_hours = accumulate_all_hours(line, report.all_hours)
